@@ -42,7 +42,7 @@ import { auth } from '../config/firebase'
 import { db } from '../config/firebase';
 import { userDataActions } from '../store/userDataSlice';
 import { authActions } from '../store/authSlice';
-import RenderList from '../components/RenderList'
+import Footer from '../components/Footer'
 
 const MainPage = (props, ref) => {
     const toast = useToast();
@@ -307,6 +307,10 @@ const MainPage = (props, ref) => {
                 </Suspense>
             }
         </main>
+        <Box w='100vw' h='200px'>
+            
+        </Box>
+        <Footer></Footer>
         </>
     )
 }
