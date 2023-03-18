@@ -68,7 +68,7 @@ const MainTextArea = (props, ref) => {
         }
 
         const timeoutId = setTimeout(async ()=>{
-            console.log('save: ',newData)
+            // console.log('save: ',newData)
             const docRef = doc(db, 'users', uid, 'files', id);
             const response = await updateDoc(docRef, {
                 fileData: newData,
