@@ -212,8 +212,8 @@ const MainPage = (props, ref) => {
                             Menu
                         </MenuButton>
                         <MenuList>
-                            <MenuItem>Download</MenuItem>
-                            <MenuItem>Delete</MenuItem>
+                            {/* <MenuItem>Download</MenuItem>
+                            <MenuItem>Delete</MenuItem> */}
                             <MenuItem onClick={newFileHandler}>New File</MenuItem>
                             <MenuItem onClick={showAllFilesHandler}>All Files</MenuItem>
                         </MenuList>
