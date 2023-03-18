@@ -1,7 +1,9 @@
-import { Link } from "react-router-dom";
-import { Outlet } from "react-router-dom";
+import { Link, Outlet, redirect, useNavigate } from "react-router-dom";
 import classes from './Toolbar.module.css'
 import { auth, provider } from '../config/firebase'
+import { collection, setDoc, addDoc, doc } from "firebase/firestore"; 
+import { db, rtdb } from '../config/firebase';
+import { ref, set, get, child } from 'firebase/database';
 import { 
     setPersistence,
     onAuthStateChanged,
@@ -12,149 +14,165 @@ import {
     browserLocalPersistence
 } from "firebase/auth";
 import { useDispatch, useSelector } from "react-redux";
-import { userDataActions } from '../store/userDataSlice'
 import { authActions } from "../store/authSlice";
-import { useEffect } from "react";
-
-import { 
-    ChevronDownIcon
-} from '@chakra-ui/icons'
+import { useEffect, useRef } from "react";
 
 import {
-    BeatLoader
-} from 'react-spinners'
-
-import {
+    Flex,
+    Button,
+    Spacer,
+    Box,
     Menu,
     MenuButton,
     MenuList,
     MenuItem,
-    MenuItemOption,
     MenuGroup,
-    MenuOptionGroup,
     MenuDivider,
-    Button, 
-    ButtonGroup,
-    Flex,
-    HStack,
-    Spacer,
-    Box,
-    FormControl,
-    FormLabel,
-    Input,
-    FormHelperText
   } from '@chakra-ui/react'
 
 
-const ToolBar = (props, ref) => {
-    const uid = 'rohit';
+const ToolBar = (props) => {
+    const logoutRef = useRef();
+    const navigate = useNavigate();
     const dispatch = useDispatch();
-    const currentFileName = useSelector(state => state.user.currentFileName);
     const isAuthenticated = useSelector(state => state.auth.isAuthenticated);
     const authenticationData = useSelector(state => state.auth.authenticationData);
-
-    const fileNameChangeHandler = (event) => {
-        dispatch(userDataActions.changeFileName(event.target.value));
-    }
 
     const signInWithGoogleHandler = async (event) => {
         event.preventDefault();
         try{
             const response = await setPersistence(auth, browserLocalPersistence)
             .then(() => signInWithPopup(auth, provider))
+            // console.log(response)
+            // console.log(response.user.uid)
 
-            // after successfully logging in get the access token and store in cookies/localStorage
+            const createdAt = response.user.metadata.createdAt;
+            const lastLoginAt = response.user.metadata.lastLoginAt;
+            // console.log(createdAt)
+            // console.log(lastLoginAt)
 
+
+            // console.log(ref)
+            const rtdbRef = ref(rtdb, '/users/' + `${response.user.uid}`);
+            const snapshot = await get(rtdbRef);
+            if(snapshot.exists()){
+                console.log('Old user, rtdb')
+                // console.log(snapshot.val());
+            }else{
+                console.log('New user, rtdb')
+                // add user existence to rtdb
+                set(ref(rtdb, 'users/' + `${response.user.uid}`), {
+                    name: response.user.displayName,
+                    email: response.user.email,
+                    profile_picture : response.user.photoURL
+                });
+
+                // add initial file for user in firestore
+                const collRef = collection(db, 'users', response.user.uid, 'files');
+                const t = Date.now();
+                const res = await addDoc(collRef, {
+                    'createdAt': t,
+                    'lastOpened': t,
+                    'fileName': 'Untitled-1.txt',
+                    'fileData': ''
+                })
+                // console.log(res);
+            }
+            
             const credential = GoogleAuthProvider.credentialFromResult(response);
             const token = credential.accessToken
             localStorage.setItem('token', token);
+            localStorage.setItem('uid', response.user.uid);
+
+            navigate('/editor/' + response.user.uid)
         }catch(err){
             console.log('SignInError', err)
         }
     }
     
     const logoutHandler = async (event) => {
-        event.preventDefault();
+        if(event){
+            event.preventDefault();
+        }
         try{
             await signOut(auth);
             localStorage.removeItem('token');
+            localStorage.removeItem('uid');
+            dispatch(authActions.changeAuthStatus(false));
+            navigate('/')
         }catch(err){
             console.log('LogOutError', err)
         }
     }
 
     // reauthorization
-    useEffect(()=>{
-        const reAuthorizeFromToken = async () => {
-            const tokenFromLocalStorage = localStorage.getItem('token');
-            if(tokenFromLocalStorage){
-                const accessToken = GoogleAuthProvider.credential(null, tokenFromLocalStorage);
-                try{
-                    const response = await signInWithCredential(auth, accessToken);
-                }catch(err){
-                    console.log('ReauthorizationError: '+err)
-                }
-            }
-        }
+    // useEffect(()=>{
+    //     const reAuthorizeFromToken = async () => {
+    //         const tokenFromLocalStorage = localStorage.getItem('token');
+    //         if(tokenFromLocalStorage && !isAuthenticated){
+    //             const accessToken = GoogleAuthProvider.credential(null, tokenFromLocalStorage);
+    //             try{
+    //                 const response = await signInWithCredential(auth, accessToken);
+    //             }catch(err){
+    //                 console.log('ReauthorizationError: '+err);
+    //                 logoutHandler();
+    //             }
+    //         }
+    //     }
 
-        reAuthorizeFromToken();
+    //     reAuthorizeFromToken();
 
-        return ()=>{
-            console.log('CLEANUP from reauthorization')
-        }
-    },[])
+    //     return ()=>{
+    //         console.log('CLEANUP!!! from reauthorization')
+    //     }
+    // },[isAuthenticated])
 
     // auth state changes
     useEffect(() => {
         onAuthStateChanged(auth, (user)=>{
             if(user){
-                dispatch(authActions.changeAuthStatus(true));
+                const uid = user.uid
+                if(!isAuthenticated){
+                    dispatch(authActions.changeAuthStatus(true));
+                }
+                if(!(authenticationData.uid)){
+                    dispatch(authActions.changeAuthData({'uid': uid}))
+                }
             }else{
-                dispatch(authActions.changeAuthStatus(false));
+                if(isAuthenticated){
+                    dispatch(authActions.changeAuthStatus(false));
+                }
+                if((authenticationData.uid)){
+                    dispatch(authActions.changeAuthData({'uid': ''}))
+                }
             }
         })
       return () => {
-        console.log('auth status changed CLEANUP!!!')
+        console.log('CLEANUP!!! from auth status changed')
       }
     }, [])
     
     return (
     <>
         <div>
-
             <Flex minWidth='max-content' alignItems='center' gap='2'>
-                <Box p='2'>
-                    <Menu>
-                        <MenuButton as={Button} rightIcon={<ChevronDownIcon />}>
-                            Menu
-                        </MenuButton>
-                        <MenuList>
-                            <MenuItem>Download</MenuItem>
-                            <MenuItem>Create a Copy</MenuItem>
-                            <MenuItem>Mark as Draft</MenuItem>
-                            <MenuItem>Delete</MenuItem>
-                            <MenuItem>Attend a Workshop</MenuItem>
-                        </MenuList>
-                    </Menu>
-                </Box>
 
-                <FormControl maxWidth='250px'>
-                    <Flex gap='2'>
+                <Button ml='2'>
+                    <Link to='/'>Home</Link>
+                </Button>
 
-                        <Input 
-                            type='text'
-                            value={currentFileName}
-                            onChange={fileNameChangeHandler}
-                        />
-                        <Button
-                            isLoading={true}
-                            colorScheme='blue'
-                            spinner={<BeatLoader size={8} color='white' />}
-                            >
-                            Click me
-                        </Button>
-                    </Flex>
-                </FormControl>
+
+                {
+                    isAuthenticated
+                    &&
+                    <Button>
+                            <Link to={'/editor/' + `${authenticationData['uid']}`}>Editor</Link>
+                    </Button>
+                }
+
+                <Button>
+                    <Link to='/about'>About</Link>
+                </Button>
 
                 <Spacer />
 
@@ -168,7 +186,7 @@ const ToolBar = (props, ref) => {
                             <MenuList>
                                 <MenuGroup title='Profile'>
                                     <MenuItem>My Account</MenuItem>
-                                    <MenuItem onClick={logoutHandler}>Logout</MenuItem>
+                                    <MenuItem ref={logoutRef} onClick={logoutHandler}>Logout</MenuItem>
                                 </MenuGroup>
                                 <MenuDivider />
                                 <MenuGroup title='Help'>

@@ -4,7 +4,10 @@ import ToolBar from "./components/ToolBar"
 import HomePage from "./pages/HomePage"
 import { RouterProvider } from "react-router-dom"
 import MainPage from "./pages/MainPage"
+import { loadAuthStatus } from './pages/MainPage'
 import AboutPage from "./pages/AboutPage"
+import UserMainPage from "./pages/UserMainPage"
+import { loadUserData } from './pages/UserMainPage'
 
 
 const router = createBrowserRouter([
@@ -13,8 +16,9 @@ const router = createBrowserRouter([
     element: <ToolBar/>,
     errorElement: <ErrorPage/>,
     children: [
-      {path: '', element: <HomePage/>},
-      {path: 'editor', element: <MainPage/>},
+      {index: true, path: '', element: <HomePage/>},
+      // {path: 'editor', element: <MainPage/>, loader: loadAuthStatus },
+      {path: 'editor/:uid', loader: loadUserData, element: <UserMainPage/>},
       {path: 'about', element: <AboutPage/>},
     ]
   }

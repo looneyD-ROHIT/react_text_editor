@@ -3,9 +3,11 @@ import { createSlice } from "@reduxjs/toolkit"
 const initialState = {
     isAuthenticated: false,
     authenticationData: {
-        token: '',
-        filesList: [],
-        totalLength: 5,
+        uid: '',
+        lastOpenedFile: {
+            id: '',
+            data: {}
+        },
     }
 }
 
@@ -17,7 +19,24 @@ const authSlice = createSlice({
             state.isAuthenticated = action.payload
         },
         changeAuthData(state, action){
-            state.authenticationData = action.payload
+            if(action.payload?.uid){
+                state.authenticationData.uid = action.payload.uid
+            }
+            if(action.payload?.lastOpenedFile?.id){
+                state.authenticationData.lastOpenedFile.id = action.payload.lastOpenedFile.id
+            }
+            if(action.payload?.lastOpenedFile?.data?.fileName){
+                state.authenticationData.lastOpenedFile.data.fileName = action.payload.lastOpenedFile.data.fileName
+            }
+            if(action.payload?.lastOpenedFile?.data?.fileData){
+                state.authenticationData.lastOpenedFile.data.fileData = action.payload.lastOpenedFile.data.fileData
+            }
+            if(action.payload?.lastOpenedFile?.data?.createdAt){
+                state.authenticationData.lastOpenedFile.data.createdAt = action.payload.lastOpenedFile.data.createdAt
+            }
+            if(action.payload?.lastOpenedFile?.data?.lastOpened){
+                state.authenticationData.lastOpenedFile.data.lastOpened = action.payload.lastOpenedFile.data.lastOpened
+            }
         }
     }
 })
