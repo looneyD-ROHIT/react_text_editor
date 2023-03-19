@@ -125,16 +125,6 @@ const MainTextArea = (props, ref) => {
 
     return (
         <Wrap p='2'>
-
-            {/* <Textarea
-            placeholder='Enter your text here'
-            size='sm'
-            resize={'none'}
-            value={newData}
-            h='55vh'
-            onChange={changeDataHandler}
-            /> */}
-
             <EditorProvider w='100%'>
                 <Editor
                 placeholder='Enter your text here'
@@ -159,19 +149,13 @@ const MainTextArea = (props, ref) => {
                         <BtnItalic />
                         <BtnUnderline />
                         <BtnStrikeThrough />
-                        {/* <Separator />
-                        <BtnNumberedList />
-                        <BtnBulletList /> */}
                         <Separator />
                         <BtnLink />
                         <BtnClearFormatting />
-                        {/* <HtmlButton /> */}
                         <Separator />
-                        {/* <BtnStyles /> */}
                     </Toolbar>
                 </Editor>
             </EditorProvider>
-
         </Wrap>
         )
     }
