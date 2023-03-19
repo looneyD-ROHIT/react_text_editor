@@ -12,6 +12,29 @@ import { db } from '../config/firebase';
 
 import { authActions } from '../store/authSlice'
 
+import { 
+    BtnBold,
+    BtnBulletList,
+    BtnClearFormatting,
+    BtnItalic,
+    BtnLink,
+    BtnNumberedList,
+    BtnRedo,
+    BtnStrikeThrough,
+    BtnStyles,
+    BtnUnderline,
+    BtnUndo,
+    HtmlButton,
+    Separator,
+    Toolbar,
+    EditorProvider,
+    Editor,
+    createButton
+} from 'react-simple-wysiwyg';
+
+const BtnAlignCenter = createButton('Align center', '≡', 'justifyCenter');
+
+
 const MainTextArea = (props, ref) => {
     const toast = useToast();
     const toastIDRef = useRef();
@@ -28,6 +51,7 @@ const MainTextArea = (props, ref) => {
         setNewData(event.target.value);
     }
 
+    // listen for changes to databases, for sync on different tabs/devices
     useEffect(()=>{
         const fetchId = setInterval(async ()=>{
             const docRef = doc(db, 'users', uid, 'files', id);
@@ -47,7 +71,7 @@ const MainTextArea = (props, ref) => {
                     }
                 }))
             }
-        }, 4000)
+        }, 10000)
 
         return () => {
             clearInterval(fetchId);
@@ -60,6 +84,7 @@ const MainTextArea = (props, ref) => {
         setInitialRun(true);
     }, [id])
 
+    // save file, when updated
     useEffect(()=>{
         // if initial run prevent useEffect call
         if(initialRun){
@@ -81,7 +106,7 @@ const MainTextArea = (props, ref) => {
                 variant: 'subtle',
                 duration: 500,
             })
-        }, 2000)
+        }, 5000)
 
 
         // clear function
@@ -90,17 +115,63 @@ const MainTextArea = (props, ref) => {
             console.log('CLEANUP!!! from file update timeout')
         }
     }, [newData])
+
+    // const [value, setValue] = useState('simple text');
+
+    // function onChange(e) {
+    //     setValue(e.target.value);
+
+    // }
+
     return (
         <Wrap p='2'>
 
-            <Textarea
+            {/* <Textarea
             placeholder='Enter your text here'
             size='sm'
             resize={'none'}
             value={newData}
             h='55vh'
             onChange={changeDataHandler}
-            />
+            /> */}
+
+            <EditorProvider w='100%'>
+                <Editor
+                placeholder='Enter your text here'
+                value={newData}
+                onChange={changeDataHandler}
+                containerProps={
+                    {
+                        style: {
+                            width: '100%',
+                            height: '75vh',
+                            resize: 'none',
+                            overflowY: 'scroll'
+                        }
+                    }
+                }
+                >
+                    <Toolbar>
+                        <BtnUndo />
+                        <BtnRedo />
+                        <Separator />
+                        <BtnBold />
+                        <BtnItalic />
+                        <BtnUnderline />
+                        <BtnStrikeThrough />
+                        {/* <Separator />
+                        <BtnNumberedList />
+                        <BtnBulletList /> */}
+                        <Separator />
+                        <BtnLink />
+                        <BtnClearFormatting />
+                        {/* <HtmlButton /> */}
+                        <Separator />
+                        {/* <BtnStyles /> */}
+                    </Toolbar>
+                </Editor>
+            </EditorProvider>
+
         </Wrap>
         )
     }
