@@ -64,6 +64,7 @@ const Footer = (props, ref) => {
     const isAuthenticated = useSelector(state => state.auth.isAuthenticated);
     return (
         <Box
+            pt='50px'
             bg={useColorModeValue('gray.50', 'gray.900')}
             color={useColorModeValue('gray.700', 'gray.200')}>
             <Container

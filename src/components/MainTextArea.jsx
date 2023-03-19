@@ -125,7 +125,7 @@ const MainTextArea = (props, ref) => {
 
     return (
         <Wrap p='2'>
-            <EditorProvider w='100%'>
+            <EditorProvider>
                 <Editor
                 placeholder='Enter your text here'
                 value={newData}
@@ -134,7 +134,7 @@ const MainTextArea = (props, ref) => {
                     {
                         style: {
                             width: '100%',
-                            height: '75vh',
+                            height: '80vh',
                             resize: 'none',
                             overflowY: 'scroll'
                         }

@@ -294,7 +294,7 @@ const MainPage = (props, ref) => {
             {
                  <Suspense fallback={
                     <Box padding='6' boxShadow='lg' bg='white'>
-                        <SkeletonText mt='4' noOfLines={20} spacing='3' skeletonHeight='1' />
+                        <SkeletonText mt='4' noOfLines={40} spacing='3' skeletonHeight='1' />
                     </Box>
                  }>
                     <Await resolve={loaderData}>
@@ -307,9 +307,6 @@ const MainPage = (props, ref) => {
                 </Suspense>
             }
         </main>
-        <Box w='100vw' h='200px'>
-            
-        </Box>
         <Footer></Footer>
         </>
     )
