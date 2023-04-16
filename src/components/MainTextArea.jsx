@@ -12,7 +12,7 @@ import { db } from '../config/firebase';
 
 import { authActions } from '../store/authSlice'
 
-import { 
+import {
     BtnBold,
     BtnBulletList,
     BtnClearFormatting,
@@ -46,19 +46,19 @@ const MainTextArea = (props, ref) => {
     const [newData, setNewData] = useState(textAreaData);
     const [fetchedData, setFetchedData] = useState(textAreaData);
     const [initialRun, setInitialRun] = useState(true);
-    
+
     const changeDataHandler = (event) => {
         setNewData(event.target.value);
     }
 
     // listen for changes to databases, for sync on different tabs/devices
-    useEffect(()=>{
-        const fetchId = setInterval(async ()=>{
+    useEffect(() => {
+        const fetchId = setInterval(async () => {
             const docRef = doc(db, 'users', uid, 'files', id);
             const response = await getDoc(docRef);
             // console.log('only fetched')
             setFetchedData(response.data().fileData);
-            if(response.data().fileData!=newData){
+            if (response.data().fileData != newData) {
                 // console.log('updated text area')
                 // console.log(response.data().fileData)
                 // console.log(newData)
@@ -71,7 +71,7 @@ const MainTextArea = (props, ref) => {
                     }
                 }))
             }
-        }, 10000)
+        }, 6000)
 
         return () => {
             clearInterval(fetchId);
@@ -80,19 +80,19 @@ const MainTextArea = (props, ref) => {
     }, [newData])
 
     // update initialRun whenever new file is opened
-    useEffect(()=>{
+    useEffect(() => {
         setInitialRun(true);
     }, [id])
 
     // save file, when updated
-    useEffect(()=>{
+    useEffect(() => {
         // if initial run prevent useEffect call
-        if(initialRun){
+        if (initialRun) {
             setInitialRun(false);
             return;
         }
 
-        const timeoutId = setTimeout(async ()=>{
+        const timeoutId = setTimeout(async () => {
             // console.log('save: ',newData)
             const docRef = doc(db, 'users', uid, 'files', id);
             const response = await updateDoc(docRef, {
@@ -106,7 +106,7 @@ const MainTextArea = (props, ref) => {
                 variant: 'subtle',
                 duration: 500,
             })
-        }, 5000)
+        }, 3000)
 
 
         // clear function
@@ -127,19 +127,19 @@ const MainTextArea = (props, ref) => {
         <Wrap p='2'>
             <EditorProvider>
                 <Editor
-                placeholder='Enter your text here'
-                value={newData}
-                onChange={changeDataHandler}
-                containerProps={
-                    {
-                        style: {
-                            width: '100%',
-                            height: '80vh',
-                            resize: 'none',
-                            overflowY: 'scroll'
+                    placeholder='Enter your text here'
+                    value={newData}
+                    onChange={changeDataHandler}
+                    containerProps={
+                        {
+                            style: {
+                                width: '100%',
+                                height: '80vh',
+                                resize: 'none',
+                                overflowY: 'scroll'
+                            }
                         }
                     }
-                }
                 >
                     <Toolbar>
                         <BtnUndo />
@@ -157,7 +157,7 @@ const MainTextArea = (props, ref) => {
                 </Editor>
             </EditorProvider>
         </Wrap>
-        )
-    }
+    )
+}
 
 export default MainTextArea;
