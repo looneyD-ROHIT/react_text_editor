@@ -75,7 +75,7 @@ const MainTextArea = (props, ref) => {
 
         return () => {
             clearInterval(fetchId);
-            console.log('CLEANUP!!! fetching data')
+            // console.log('CLEANUP!!! fetching data')
         }
     }, [newData])
 
@@ -112,7 +112,7 @@ const MainTextArea = (props, ref) => {
         // clear function
         return () => {
             clearTimeout(timeoutId);
-            console.log('CLEANUP!!! from file update timeout')
+            // console.log('CLEANUP!!! from file update timeout')
         }
     }, [newData])
 

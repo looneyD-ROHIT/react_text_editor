@@ -92,7 +92,7 @@ const AboutPage = () => {
                 const users = {}
                 setTotalUsers(Object.keys(snapshot.val()).length);
                 Object.keys(snapshot.val()).forEach(async (userId) => {
-                    console.log(userId);
+                    // console.log(userId);
                     const fileRef = collection(db, 'users', userId, 'files');
                     const filesResponse = await getDocs(fileRef);
                     const files = {}
@@ -117,17 +117,17 @@ const AboutPage = () => {
                             return prev + num2
                         });
                     })
-                    console.log(files);
+                    // console.log(files);
                     users[userId] = files;
                 })
-                console.log(users);
+                // console.log(users);
                 setUsers(users);
             } catch (error) {
                 console.error('error while fetching records: ', error);
             }
         }, 300);
         return () => {
-            console.log('CLEANUP!!! from about page')
+            // console.log('CLEANUP!!! from about page')
             clearTimeout(timerId);
         }
     }, [])

@@ -1,4 +1,4 @@
-import { 
+import {
     setPersistence,
     onAuthStateChanged,
     signInWithPopup,
@@ -11,7 +11,7 @@ import {
 import { auth } from './firebase';
 import { provider } from './firebase';
 
-import { collection, setDoc, addDoc, doc } from "firebase/firestore"; 
+import { collection, setDoc, addDoc, doc } from "firebase/firestore";
 import { db, rtdb } from '../config/firebase';
 import { ref, set, get, child } from 'firebase/database';
 
@@ -19,9 +19,9 @@ import { ref, set, get, child } from 'firebase/database';
 
 const signInWithGoogleHandler = async (event) => {
     event.preventDefault();
-    try{
+    try {
         const response = await setPersistence(auth, browserLocalPersistence)
-        .then(() => signInWithPopup(auth, provider))
+            .then(() => signInWithPopup(auth, provider))
         // console.log(response)
         // console.log(response.user.uid)
 
@@ -34,16 +34,16 @@ const signInWithGoogleHandler = async (event) => {
         // console.log(ref)
         const rtdbRef = ref(rtdb, '/users/' + `${response.user.uid}`);
         const snapshot = await get(rtdbRef);
-        if(snapshot.exists()){
-            console.log('Old user, rtdb')
+        if (snapshot.exists()) {
+            // console.log('Old user, rtdb')
             // console.log(snapshot.val());
-        }else{
-            console.log('New user, rtdb')
+        } else {
+            // console.log('New user, rtdb')
             // add user existence to rtdb
             set(ref(rtdb, 'users/' + `${response.user.uid}`), {
                 name: response.user.displayName,
                 email: response.user.email,
-                profile_picture : response.user.photoURL
+                profile_picture: response.user.photoURL
             });
 
             // add initial file for user in firestore
@@ -57,14 +57,14 @@ const signInWithGoogleHandler = async (event) => {
             })
             // console.log(res);
         }
-        
+
         const credential = GoogleAuthProvider.credentialFromResult(response);
         const token = credential.accessToken
         localStorage.setItem('token', token);
         localStorage.setItem('uid', response.user.uid);
         // redirect('/editor/' + response.user.uid)
-    }catch(err){
-        console.log('SignInError', err)
+    } catch (err) {
+        // console.log('SignInError', err)
     }
 }
 

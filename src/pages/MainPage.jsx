@@ -2,7 +2,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { redirect } from 'react-router-dom'
 import { userDataActions } from '../store/userDataSlice'
 
-import { 
+import {
     ChevronDownIcon
 } from '@chakra-ui/icons'
 
@@ -49,7 +49,7 @@ const MainPage = (props, ref) => {
                 <FormControl maxWidth='250px'>
                     <Flex gap='2'>
 
-                        <Input 
+                        <Input
                             type='text'
                             value={currentFileName}
                             onChange={fileNameChangeHandler}
@@ -58,7 +58,7 @@ const MainPage = (props, ref) => {
                             isLoading={true}
                             colorScheme='blue'
                             spinner={<BeatLoader size={8} color='white' />}
-                            >
+                        >
                             Click me
                         </Button>
                     </Flex>
@@ -70,11 +70,11 @@ const MainPage = (props, ref) => {
 
 export default MainPage;
 
-export const loadAuthStatus = ({request, params}) => {
+export const loadAuthStatus = ({ request, params }) => {
     const token = localStorage.getItem('token')
     const uid = localStorage.getItem('uid')
-    if(token){
-        console.log('redirect')
+    if (token) {
+        // console.log('redirect')
         return redirect('/editor/' + uid)
     }
     return null
