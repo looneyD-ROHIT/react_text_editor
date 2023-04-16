@@ -8,7 +8,9 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import { useRef } from 'react';
 
-import { db } from '../config/firebase';
+import { db, rtdb } from '../config/firebase';
+
+import {ref as dbRef, get, set, ref} from 'firebase/database';
 
 import { authActions } from '../store/authSlice'
 
@@ -106,6 +108,61 @@ const MainTextArea = (props, ref) => {
                 variant: 'subtle',
                 duration: 500,
             })
+
+            const resp = await getDoc(docRef);
+            console.log();
+            const newFileData = resp.data().fileData;
+
+            const rtdbRef = dbRef(rtdb, '/totalCount/');
+            const snapshot = await get(rtdbRef);
+            console.log(snapshot.val());
+            // console.log(snapshot.val());
+            // character count
+            const cleanCharacters = newFileData.replace(/<(?:.|\n)*?>/gm, '').replace(/(\r\n|\n|\r)/gm, "").replace('&nbsp;', '');
+            const num1 = cleanCharacters.trim().length;
+            // word count
+            const cleanWords = newFileData.replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ');
+            const num2 = cleanWords.trim().split(/\s+/).length;
+
+            if (props.prevTotalCount.totalCharacters != num1 || props.prevTotalCount.totalCharacters != num1) {
+                // characters
+                console.log(num1);
+                console.log(props.prevTotalCount.totalCharacters);
+                const diff = num1 - props.prevTotalCount.totalCharacters;
+                console.log(diff);
+                const newTotalCharacters = (snapshot.val().totalCharacters + diff) >= 0 ? snapshot.val().totalCharacters + diff : 0;
+                console.log(newTotalCharacters);
+                props.setPrevTotalCount(prev => {
+                    return {
+                        ...prev,
+                        totalCharacters: num1
+                    }
+                })
+
+
+                // words
+                console.log(num2);
+                console.log(props.prevTotalCount.totalWords);
+                const diff2 = num2 - props.prevTotalCount.totalWords;
+                console.log(diff2);
+                const newTotalWords = (snapshot.val().totalWords + diff2) >= 0 ? snapshot.val().totalWords + diff2 : 0;
+                console.log(newTotalWords);
+                props.setPrevTotalCount(prev => {
+                    return {
+                        ...prev,
+                        totalWords: num2
+                    }
+                })
+
+
+                await set(rtdbRef, {
+                    totalUsers: snapshot.val().totalUsers,
+                    totalWords: newTotalWords,
+                    totalCharacters: newTotalCharacters
+                });
+            }
+
+
         }, 3000)
 
 

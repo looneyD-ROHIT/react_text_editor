@@ -1,10 +1,10 @@
 import { useSelector, useDispatch } from 'react-redux';
-import { collection, getDoc, getDocs, doc, updateDoc, addDoc } from "firebase/firestore"; 
+import { collection, getDoc, getDocs, doc, updateDoc, addDoc } from "firebase/firestore";
 import { useState, useEffect, useRef, useCallback, Suspense } from 'react';
 import { useLoaderData, useNavigate, redirect, useNavigation, json, defer, Await, Form } from 'react-router-dom';
 import _ from 'lodash'
 
-import { 
+import {
     ChevronDownIcon
 } from '@chakra-ui/icons'
 
@@ -56,6 +56,11 @@ const MainPage = (props, ref) => {
     const [savedFileName, setSavedFileName] = useState(lastOpenedFileName);
     const [allFilesLoading, setAllFilesLoading] = useState(false);
     const [allFilesList, setAllFilesList] = useState([]);
+    const [totalCount, setTotalCount] = useState({
+        totalWords: 0,
+        totalCharacters: 0,
+        totalUsers: 0,
+    });
 
     const fileNameChangeHandler = (event) => {
         // dispatch(userDataActions.changeFileName(event.target.value));
@@ -65,7 +70,7 @@ const MainPage = (props, ref) => {
     const fileNameChangeSaveHandler = async (event) => {
         event.preventDefault();
 
-        if(savedFileName === lastOpenedFileName){
+        if (savedFileName === lastOpenedFileName) {
             // console.log('Old File Name same as New File Name');
             toastIDRef.current = toast({
                 title: 'File not saved.',
@@ -81,7 +86,7 @@ const MainPage = (props, ref) => {
         event.target.innerHTML = `<div class="chakra-button__spinner chakra-button__spinner--start css-1aamklj"><span style="display: inherit;"><span style="display: inline-block; background-color: white; width: 8px; height: 8px; margin: 2px; border-radius: 100%; animation: 0.7s linear 0s infinite normal both running react-spinners-BeatLoader-beat;"></span><span style="display: inline-block; background-color: white; width: 8px; height: 8px; margin: 2px; border-radius: 100%; animation: 0.7s linear 0.35s infinite normal both running react-spinners-BeatLoader-beat;"></span><span style="display: inline-block; background-color: white; width: 8px; height: 8px; margin: 2px; border-radius: 100%; animation: 0.7s linear 0s infinite normal both running react-spinners-BeatLoader-beat;"></span></span></div>`
 
         dispatch(authActions.changeAuthData({
-            lastOpenedFile:{
+            lastOpenedFile: {
                 data: {
                     fileName: savedFileName,
                 }
@@ -100,14 +105,14 @@ const MainPage = (props, ref) => {
         const fileNames = new Set();
         let previousSaved = '';
         res.forEach(file => {
-            if(file.id === id){
+            if (file.id === id) {
                 previousSaved = file.data().fileName;
             }
             fileNames.add(file.data().fileName);
         })
 
         const newFileName = savedFileName
-        if(fileNames.has(newFileName)){
+        if (fileNames.has(newFileName)) {
             // unsuccessful
             // change name back to previousSaved
             event.target.innerHTML = `Save FileName`
@@ -119,7 +124,7 @@ const MainPage = (props, ref) => {
                 duration: 800,
                 isClosable: true,
             })
-            return dispatch(authActions.changeAuthData({ lastOpenedFile: { data: { fileName: previousSaved } }}));
+            return dispatch(authActions.changeAuthData({ lastOpenedFile: { data: { fileName: previousSaved } } }));
         }
 
         const docRef = doc(db, 'users', authenticationData.uid, 'files', id)
@@ -185,17 +190,39 @@ const MainPage = (props, ref) => {
 
 
     // dispatching the auth data when loader ends
-    useEffect(()=>{
+    useEffect(() => {
         loaderData.then(ld => {
             dispatch(authActions.changeAuthData({
                 uid,
                 lastOpenedFile: ld.lastOpenedFile
             }))
+            const fileData = `${ld.lastOpenedFile.data.fileData}`
+            // character count
+            const cleanCharacters = fileData.replace(/<(?:.|\n)*?>/gm, '').replace(/(\r\n|\n|\r)/gm, "").replace('&nbsp;', '');
+            const num1 = cleanCharacters.trim().length;
+            console.log(num1);
+            setTotalCount(prev => {
+                return {
+                    ...prev,
+                    totalCharacters: num1
+                }
+            });
+
+            // word count
+            const cleanWords = fileData.replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ');
+            const num2 = cleanWords.trim().split(/\s+/).length;
+            console.log(num2);
+            setTotalCount(prev => {
+                return {
+                    ...prev,
+                    totalWords: num2
+                }
+            });
         })
     }, [])
 
     // changing the file name when auth data loads
-    useEffect(()=>{
+    useEffect(() => {
         setSavedFileName(lastOpenedFileName);
     }, [authenticationData])
 
@@ -204,125 +231,125 @@ const MainPage = (props, ref) => {
 
     return (
         <>
-        <header>
-            <Flex gap='4' align='center'>
-                <Box p='2'>
-                    <Menu>
-                        <MenuButton as={Button} rightIcon={<ChevronDownIcon />}>
-                            Menu
-                        </MenuButton>
-                        <MenuList>
-                            {/* <MenuItem>Download</MenuItem>
+            <header>
+                <Flex gap='4' align='center'>
+                    <Box p='2'>
+                        <Menu>
+                            <MenuButton as={Button} rightIcon={<ChevronDownIcon />}>
+                                Menu
+                            </MenuButton>
+                            <MenuList>
+                                {/* <MenuItem>Download</MenuItem>
                             <MenuItem>Delete</MenuItem> */}
-                            <MenuItem onClick={newFileHandler}>New File</MenuItem>
-                            <MenuItem onClick={showAllFilesHandler}>All Files</MenuItem>
-                        </MenuList>
-                    </Menu>
-                </Box>
-
-                <FormControl maxWidth='250px'>
-                    <Form>
-                        <Flex gap='2'>
-
-                            <Input 
-                                type='text'
-                                htmlFor='fileName'
-                                name='fileName'
-                                value={savedFileName ? savedFileName : ''}
-                                onChange={fileNameChangeHandler}
-                                />
-                            <Button
-                                type='submit'
-                                w='300px'
-                                // isLoading={lastOpenedFileName === savedFileName}
-                                colorScheme='blue'
-                                onClick={fileNameChangeSaveHandler}
-                                isDisabled={lastOpenedFileName == savedFileName}
-                                >
-                                Save FileName
-                            </Button>
-                        </Flex>
-                    </Form>
-                </FormControl>
-            </Flex>
-        </header>
-        <Modal isCentered isOpen={isOpen} onClose={onClose} scrollBehavior='inside'>
-            <ModalOverlay
-            bg='none'
-            backdropFilter='auto'
-            backdropInvert='80%'
-            backdropBlur='2px'
-            />
-            <ModalContent maxW="60vw" minW='800px' minH='500px' maxH='600px'>
-            <ModalHeader>All Files</ModalHeader>
-            <ModalCloseButton />
-            <ModalBody>
-                <Box>
-
-                    {
-                        allFilesLoading
-                        ?
-                        <Skeleton>
-                            <div>Something to put in here!!!</div>
-                            <div>Something to put in here!!!</div>
-                            <div>Something to put in here!!!</div>
-                            <div>Something to put in here!!!</div>
-                            <div>Something to put in here!!!</div>
-                            <div>Something to put in here!!!</div>
-                            <div>Something to put in here!!!</div>
-                            <div>Something to put in here!!!</div>
-                            <div>Something to put in here!!!</div>
-                            <div>Something to put in here!!!</div>
-                            <div>Something to put in here!!!</div>
-                            <div>Something to put in here!!!</div>
-                            <div>Something to put in here!!!</div>
-                            <div>Something to put in here!!!</div>
-                            <div>Something to put in here!!!</div>
-                            <div>Something to put in here!!!</div>
-                        </Skeleton>
-                        :
-                        <AllFilesList list={allFilesList} />
-                    }
-                </Box>
-            </ModalBody>
-            <ModalFooter>
-                <Button onClick={onClose}>Close</Button>
-            </ModalFooter>
-            </ModalContent>
-        </Modal>
-        <main>
-            {
-                 <Suspense fallback={
-                    <Box padding='6' boxShadow='lg' bg='white'>
-                        <SkeletonText mt='4' noOfLines={40} spacing='3' skeletonHeight='1' />
+                                <MenuItem onClick={newFileHandler}>New File</MenuItem>
+                                <MenuItem onClick={showAllFilesHandler}>All Files</MenuItem>
+                            </MenuList>
+                        </Menu>
                     </Box>
-                 }>
-                    <Await resolve={loaderData}>
-                        {
-                            (loaderData) => {
-                                return <MainTextArea loaderData={loaderData} />
+
+                    <FormControl maxWidth='250px'>
+                        <Form>
+                            <Flex gap='2'>
+
+                                <Input
+                                    type='text'
+                                    htmlFor='fileName'
+                                    name='fileName'
+                                    value={savedFileName ? savedFileName : ''}
+                                    onChange={fileNameChangeHandler}
+                                />
+                                <Button
+                                    type='submit'
+                                    w='300px'
+                                    // isLoading={lastOpenedFileName === savedFileName}
+                                    colorScheme='blue'
+                                    onClick={fileNameChangeSaveHandler}
+                                    isDisabled={lastOpenedFileName == savedFileName}
+                                >
+                                    Save FileName
+                                </Button>
+                            </Flex>
+                        </Form>
+                    </FormControl>
+                </Flex>
+            </header>
+            <Modal isCentered isOpen={isOpen} onClose={onClose} scrollBehavior='inside'>
+                <ModalOverlay
+                    bg='none'
+                    backdropFilter='auto'
+                    backdropInvert='80%'
+                    backdropBlur='2px'
+                />
+                <ModalContent maxW="60vw" minW='800px' minH='500px' maxH='600px'>
+                    <ModalHeader>All Files</ModalHeader>
+                    <ModalCloseButton />
+                    <ModalBody>
+                        <Box>
+
+                            {
+                                allFilesLoading
+                                    ?
+                                    <Skeleton>
+                                        <div>Something to put in here!!!</div>
+                                        <div>Something to put in here!!!</div>
+                                        <div>Something to put in here!!!</div>
+                                        <div>Something to put in here!!!</div>
+                                        <div>Something to put in here!!!</div>
+                                        <div>Something to put in here!!!</div>
+                                        <div>Something to put in here!!!</div>
+                                        <div>Something to put in here!!!</div>
+                                        <div>Something to put in here!!!</div>
+                                        <div>Something to put in here!!!</div>
+                                        <div>Something to put in here!!!</div>
+                                        <div>Something to put in here!!!</div>
+                                        <div>Something to put in here!!!</div>
+                                        <div>Something to put in here!!!</div>
+                                        <div>Something to put in here!!!</div>
+                                        <div>Something to put in here!!!</div>
+                                    </Skeleton>
+                                    :
+                                    <AllFilesList list={allFilesList} />
                             }
-                        }
-                    </Await>
-                </Suspense>
-            }
-        </main>
-        <Footer></Footer>
+                        </Box>
+                    </ModalBody>
+                    <ModalFooter>
+                        <Button onClick={onClose}>Close</Button>
+                    </ModalFooter>
+                </ModalContent>
+            </Modal>
+            <main>
+                {
+                    <Suspense fallback={
+                        <Box padding='6' boxShadow='lg' bg='white'>
+                            <SkeletonText mt='4' noOfLines={40} spacing='3' skeletonHeight='1' />
+                        </Box>
+                    }>
+                        <Await resolve={loaderData}>
+                            {
+                                (loaderData) => {
+                                    return <MainTextArea prevTotalCount={totalCount} setPrevTotalCount={setTotalCount} loaderData={loaderData} />
+                                }
+                            }
+                        </Await>
+                    </Suspense>
+                }
+            </main>
+            <Footer></Footer>
         </>
     )
 }
 
 export default MainPage;
 
-const loadUserDataHelper = async ({request, params}) => {
+const loadUserDataHelper = async ({ request, params }) => {
 
     const filesRef = collection(db, 'users', params.uid, 'files')
 
     const response = await getDocs(filesRef)
 
     let list = []
-    response.forEach((doc)=>{
-        list.push ({
+    response.forEach((doc) => {
+        list.push({
             id: doc.id,
             data: {
                 fileName: doc.data().fileName,
@@ -333,14 +360,14 @@ const loadUserDataHelper = async ({request, params}) => {
         })
     })
 
-    const val = list.sort((a, b)=> b.data.lastOpened - a.data.lastOpened)[0]
+    const val = list.sort((a, b) => b.data.lastOpened - a.data.lastOpened)[0]
 
-    return {lastOpenedFile: val};
+    return { lastOpenedFile: val };
 }
 
-export const loadUserData = ({request, params}) => {
+export const loadUserData = ({ request, params }) => {
     return defer({
-        loaderData: loadUserDataHelper({request, params})
+        loaderData: loadUserDataHelper({ request, params })
     })
 }
 

@@ -81,45 +81,51 @@ const AboutPage = () => {
     const [totalCharacters, setTotalCharacters] = useState(0);
     const [totalWords, setTotalWords] = useState(0);
     const [totalUsers, setTotalUsers] = useState(0);
-    const [users, setUsers] = useState({});
     useEffect(() => {
         const timerId = setTimeout(async () => {
             try {
-                let wordCount = 0;
-                const rtdbRef = ref(rtdb, '/users/');
-                const snapshot = await get(rtdbRef);
-                // console.log(snapshot.val());
-                const users = {}
-                setTotalUsers(Object.keys(snapshot.val()).length);
-                Object.keys(snapshot.val()).forEach(async (userId) => {
-                    // console.log(userId);
-                    const fileRef = collection(db, 'users', userId, 'files');
-                    const filesResponse = await getDocs(fileRef);
-                    const files = {}
-                    filesResponse.forEach(async (file) => {
-                        // files[file.id] = ""
-                        const fileDataRef = doc(db, 'users', userId, 'files', file.id);
-                        let fileData = await getDoc(fileDataRef);
-                        fileData = fileData.data().fileData;
-                        files[file.id] = `${fileData}`
+                const rtdbCountRef = ref(rtdb, '/totalCount');
+                const res = await get(rtdbCountRef);
+                console.log(res.val());
+                setTotalCharacters(res.val().totalCharacters);
+                setTotalWords(res.val().totalWords);
+                setTotalUsers(res.val().totalUsers);
 
-                        // character count
-                        const cleanCharacters = fileData.replace(/<(?:.|\n)*?>/gm, '').replace(/(\r\n|\n|\r)/gm, "").replace('&nbsp;', '');
-                        const num1 = cleanCharacters.trim().length;
-                        setTotalCharacters(prev => {
-                            return prev + num1
-                        });
+                // let wordCount = 0;
+                // const rtdbRef = ref(rtdb, '/users/');
+                // const snapshot = await get(rtdbRef);
+                // // console.log(snapshot.val());
+                // const users = {}
+                // setTotalUsers(Object.keys(snapshot.val()).length);
+                // Object.keys(snapshot.val()).forEach(async (userId) => {
+                //     // console.log(userId);
+                //     const fileRef = collection(db, 'users', userId, 'files');
+                //     const filesResponse = await getDocs(fileRef);
+                //     const files = {}
+                //     filesResponse.forEach(async (file) => {
+                //         // files[file.id] = ""
+                //         const fileDataRef = doc(db, 'users', userId, 'files', file.id);
+                //         let fileData = await getDoc(fileDataRef);
+                //         fileData = fileData.data().fileData;
+                //         files[file.id] = `${fileData}`
 
-                        // word count
-                        const cleanWords = fileData.replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ');
-                        const num2 = cleanWords.trim().split(/\s+/).length;
-                        setTotalWords(prev => {
-                            return prev + num2
-                        });
-                    })
-                    // console.log(files);
-                    users[userId] = files;
-                })
+                //         // character count
+                //         const cleanCharacters = fileData.replace(/<(?:.|\n)*?>/gm, '').replace(/(\r\n|\n|\r)/gm, "").replace('&nbsp;', '');
+                //         const num1 = cleanCharacters.trim().length;
+                //         setTotalCharacters(prev => {
+                //             return prev + num1
+                //         });
+
+                //         // word count
+                //         const cleanWords = fileData.replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ');
+                //         const num2 = cleanWords.trim().split(/\s+/).length;
+                //         setTotalWords(prev => {
+                //             return prev + num2
+                //         });
+                //     })
+                //     // console.log(files);
+                //     users[userId] = files;
+                // })
                 // console.log(users);
                 setUsers(users);
             } catch (error) {

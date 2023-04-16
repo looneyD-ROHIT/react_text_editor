@@ -13,7 +13,7 @@ import { provider } from './firebase';
 
 import { collection, setDoc, addDoc, doc } from "firebase/firestore";
 import { db, rtdb } from '../config/firebase';
-import { ref, set, get, child } from 'firebase/database';
+import {ref, set, get, child, ref as dbRef} from 'firebase/database';
 
 // import { redirect } from "react-router-dom";
 
@@ -40,10 +40,18 @@ const signInWithGoogleHandler = async (event) => {
         } else {
             // console.log('New user, rtdb')
             // add user existence to rtdb
-            set(ref(rtdb, 'users/' + `${response.user.uid}`), {
+            await set(ref(rtdb, 'users/' + `${response.user.uid}`), {
                 name: response.user.displayName,
                 email: response.user.email,
                 profile_picture: response.user.photoURL
+            });
+
+            const rtdbRefCount = ref(rtdb, '/totalCount/');
+            const snapshotCount = await get(rtdbRefCount);
+            await set(rtdbRefCount, {
+                totalUsers: snapshotCount.val().totalUsers ? snapshotCount.val().totalUsers + 1 : 1,
+                totalWords: snapshotCount.val().totalWords,
+                totalCharacters: snapshotCount.val().totalCharacters
             });
 
             // add initial file for user in firestore
