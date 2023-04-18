@@ -87,7 +87,7 @@ const AboutPage = () => {
                 <SimpleGrid columns={{ base: 1, md: 3 }} spacing={{ base: 5, lg: 8 }}>
                     <StatsCard
                         title={'Our Library'}
-                        stat={`Words: ${totalWords}`}
+                        stat={`Words: ${totalWords}+`}
                         icon={<BsFileText size={'3em'} />}
                     />
                     <StatsCard
