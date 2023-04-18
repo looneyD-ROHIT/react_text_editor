@@ -1,48 +1,41 @@
-import { useSelector, useDispatch } from 'react-redux';
-import { collection, getDoc, getDocs, doc, updateDoc, addDoc } from "firebase/firestore";
-import { useState, useEffect, useRef, useCallback, Suspense } from 'react';
-import { useLoaderData, useNavigate, redirect, useNavigation, json, defer, Await, Form } from 'react-router-dom';
-import _ from 'lodash'
+import { addDoc, collection, doc, getDocs, updateDoc } from "firebase/firestore";
+import { Suspense, useEffect, useRef, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { Await, Form, defer, useLoaderData, useNavigate, useNavigation } from 'react-router-dom';
 
 import {
     ChevronDownIcon
-} from '@chakra-ui/icons'
+} from '@chakra-ui/icons';
 
-import {
-    BeatLoader
-} from 'react-spinners'
 
 import {
     Box,
+    Button,
+    Flex,
+    FormControl,
+    Input,
     Menu,
     MenuButton,
-    MenuList,
     MenuItem,
-    FormControl,
-    Flex,
-    Input,
-    Button,
-    Skeleton,
-    SkeletonText,
-    useToast,
-    useDisclosure,
+    MenuList,
     Modal,
-    ModalOverlay,
-    ModalContent,
-    ModalHeader,
-    ModalFooter,
     ModalBody,
     ModalCloseButton,
-    Text,
+    ModalContent,
+    ModalFooter,
+    ModalHeader,
+    ModalOverlay,
+    Skeleton,
+    SkeletonText,
+    useDisclosure,
+    useToast
 } from '@chakra-ui/react';
 
-import MainTextArea from '../components/MainTextArea'
-import AllFilesList from '../components/AllFilesList'
-import { auth } from '../config/firebase'
+import AllFilesList from '../components/AllFilesList';
+import Footer from '../components/Footer';
+import MainTextArea from '../components/MainTextArea';
 import { db } from '../config/firebase';
-import { userDataActions } from '../store/userDataSlice';
 import { authActions } from '../store/authSlice';
-import Footer from '../components/Footer'
 
 const MainPage = (props, ref) => {
     const toast = useToast();
@@ -370,51 +363,3 @@ export const loadUserData = ({ request, params }) => {
         loaderData: loadUserDataHelper({ request, params })
     })
 }
-
-// export const action = async ({request, params}) => {
-//     console.log('inside action')
-//     const data = await request.formData();
-
-//     const collRef = collection(db, 'users', params.uid, 'files');
-//     const res = await getDocs(collRef)
-//     const id = data.get('id');
-//     const fileNames = new Set();
-//     let previousSaved = '';
-//     res.forEach(file => {
-//         if(file.id === id){
-//             previousSaved = file.data().fileName;
-//         }
-//         fileNames.add(file.data().fileName);
-//     })
-
-//     const newFileName = data.get('fileName');
-//     console.log(fileNames)
-//     if(fileNames.has(newFileName)){
-//         return new Response(
-//             {
-//                 success: false,
-//                 message: 'unsuccessful',
-//                 oldName: previousSaved
-//             },
-//             {
-//                 status: 500
-//             }
-//         ) 
-//     }
-
-//     const docRef = doc(db, 'users', params.uid, 'files', id)
-
-//     const response = await updateDoc(docRef, {
-//         fileName: newFileName
-//     })
-//     console.log(response)
-//     return new Response(
-//         {
-//             success: true,
-//             message: 'successful'
-//         },
-//         {
-//             status: 200
-//         } 
-//     )
-// }

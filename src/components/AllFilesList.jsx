@@ -1,4 +1,4 @@
-import { Flex, Box, SimpleGrid, Heading, Button, Text, Card, CardHeader, CardBody, CardFooter } from '@chakra-ui/react';
+import { Box, Button, Card, CardBody, CardFooter, CardHeader, Flex, Heading, SimpleGrid, Text } from '@chakra-ui/react';
 
 import { useSelector } from 'react-redux';
 
@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 
 import { db } from '../config/firebase';
 
-import { doc, updateDoc } from 'firebase/firestore'
+import { doc, updateDoc } from 'firebase/firestore';
 
 function getFormattedDate(today) {
     let week = new Array('Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat');

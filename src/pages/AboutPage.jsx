@@ -1,30 +1,3 @@
-// import { Box } from '@chakra-ui/react';
-// import Footer from '../components/Footer';
-
-// const AboutPage = (props, ref) => {
-//     return (
-//         <>
-//             <Box>
-//                 About US
-//             </Box>
-//             <Box>
-//                 Lorem ipsum dolor sit, amet consectetur adipisicing elit. Modi doloremque et deleniti! Possimus dignissimos ipsum iusto delectus blanditiis similique amet. Odio cupiditate culpa enim doloremque molestias. Expedita ullam numquam dolorem sequi veniam illo adipisci consequatur eos molestiae, nulla voluptates eligendi tempore commodi vitae, necessitatibus cumque! Fugit nesciunt velit, quod atque nisi omnis. Neque asperiores reiciendis veritatis, labore nulla exercitationem, corporis quasi molestiae enim suscipit quod, magni quo sit ipsum?
-//                 Lorem ipsum dolor sit, amet consectetur adipisicing elit. Modi doloremque et deleniti! Possimus dignissimos ipsum iusto delectus blanditiis similique amet. Odio cupiditate culpa enim doloremque molestias. Expedita ullam numquam dolorem sequi veniam illo adipisci consequatur eos molestiae, nulla voluptates eligendi tempore commodi vitae, necessitatibus cumque! Fugit nesciunt velit, quod atque nisi omnis. Neque asperiores reiciendis veritatis, labore nulla exercitationem, corporis quasi molestiae enim suscipit quod, magni quo sit ipsum?
-//                 Lorem ipsum dolor sit, amet consectetur adipisicing elit. Modi doloremque et deleniti! Possimus dignissimos ipsum iusto delectus blanditiis similique amet. Odio cupiditate culpa enim doloremque molestias. Expedita ullam numquam dolorem sequi veniam illo adipisci consequatur eos molestiae, nulla voluptates eligendi tempore commodi vitae, necessitatibus cumque! Fugit nesciunt velit, quod atque nisi omnis. Neque asperiores reiciendis veritatis, labore nulla exercitationem, corporis quasi molestiae enim suscipit quod, magni quo sit ipsum?
-//                 Lorem ipsum dolor sit, amet consectetur adipisicing elit. Modi doloremque et deleniti! Possimus dignissimos ipsum iusto delectus blanditiis similique amet. Odio cupiditate culpa enim doloremque molestias. Expedita ullam numquam dolorem sequi veniam illo adipisci consequatur eos molestiae, nulla voluptates eligendi tempore commodi vitae, necessitatibus cumque! Fugit nesciunt velit, quod atque nisi omnis. Neque asperiores reiciendis veritatis, labore nulla exercitationem, corporis quasi molestiae enim suscipit quod, magni quo sit ipsum?
-//             </Box>
-//             <Box w='100vw' h='200px'>
-
-//             </Box>
-//             <Footer></Footer>
-//         </>
-//     )
-// }
-
-// export default AboutPage;
-
-
-
 import {
     Box,
     chakra,
@@ -36,15 +9,14 @@ import {
     useColorModeValue,
 } from '@chakra-ui/react';
 
-import { ReactNode, useState, useEffect } from 'react';
-import { BsPerson, BsFileText } from 'react-icons/bs';
+import { useEffect, useState } from 'react';
+import { BsFileText, BsPerson } from 'react-icons/bs';
 import { GoLocation } from 'react-icons/go';
 
-import { db, rtdb } from '../config/firebase';
+import { rtdb } from '../config/firebase';
 
-import { doc, collection, getDocs, getDoc } from 'firebase/firestore';
 
-import { ref, get } from 'firebase/database';
+import { get, ref } from 'firebase/database';
 
 import Footer from '../components/Footer';
 function StatsCard(props) {
@@ -90,43 +62,6 @@ const AboutPage = () => {
                 setTotalCharacters(res.val().totalCharacters);
                 setTotalWords(res.val().totalWords);
                 setTotalUsers(res.val().totalUsers);
-
-                // let wordCount = 0;
-                // const rtdbRef = ref(rtdb, '/users/');
-                // const snapshot = await get(rtdbRef);
-                // // console.log(snapshot.val());
-                // const users = {}
-                // setTotalUsers(Object.keys(snapshot.val()).length);
-                // Object.keys(snapshot.val()).forEach(async (userId) => {
-                //     // console.log(userId);
-                //     const fileRef = collection(db, 'users', userId, 'files');
-                //     const filesResponse = await getDocs(fileRef);
-                //     const files = {}
-                //     filesResponse.forEach(async (file) => {
-                //         // files[file.id] = ""
-                //         const fileDataRef = doc(db, 'users', userId, 'files', file.id);
-                //         let fileData = await getDoc(fileDataRef);
-                //         fileData = fileData.data().fileData;
-                //         files[file.id] = `${fileData}`
-
-                //         // character count
-                //         const cleanCharacters = fileData.replace(/<(?:.|\n)*?>/gm, '').replace(/(\r\n|\n|\r)/gm, "").replace('&nbsp;', '');
-                //         const num1 = cleanCharacters.trim().length;
-                //         setTotalCharacters(prev => {
-                //             return prev + num1
-                //         });
-
-                //         // word count
-                //         const cleanWords = fileData.replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ');
-                //         const num2 = cleanWords.trim().split(/\s+/).length;
-                //         setTotalWords(prev => {
-                //             return prev + num2
-                //         });
-                //     })
-                //     // console.log(files);
-                //     users[userId] = files;
-                // })
-                // console.log(users);
                 setUsers(users);
             } catch (error) {
                 console.error('error while fetching records: ', error);

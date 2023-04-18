@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 
-import { Wrap, Textarea, Alert, AlertIcon, useToast } from "@chakra-ui/react";
+import { Wrap, useToast } from "@chakra-ui/react";
 
-import { doc, updateDoc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, updateDoc } from 'firebase/firestore';
 
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -10,33 +10,24 @@ import { useRef } from 'react';
 
 import { db, rtdb } from '../config/firebase';
 
-import {ref as dbRef, get, set, ref} from 'firebase/database';
+import { ref as dbRef, get, set } from 'firebase/database';
 
-import { authActions } from '../store/authSlice'
+import { authActions } from '../store/authSlice';
 
 import {
     BtnBold,
-    BtnBulletList,
     BtnClearFormatting,
     BtnItalic,
     BtnLink,
-    BtnNumberedList,
     BtnRedo,
     BtnStrikeThrough,
-    BtnStyles,
     BtnUnderline,
     BtnUndo,
-    HtmlButton,
-    Separator,
-    Toolbar,
-    EditorProvider,
     Editor,
-    createButton
+    EditorProvider,
+    Separator,
+    Toolbar
 } from 'react-simple-wysiwyg';
-
-const BtnAlignCenter = createButton('Align center', '≡', 'justifyCenter');
-
-
 const MainTextArea = (props, ref) => {
     const toast = useToast();
     const toastIDRef = useRef();

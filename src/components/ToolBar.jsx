@@ -1,30 +1,25 @@
-import { Link, Outlet, redirect, useNavigate } from "react-router-dom";
-import classes from './Toolbar.module.css'
-import { auth, provider } from '../config/firebase'
-import { collection, setDoc, addDoc, doc } from "firebase/firestore";
-import { db, rtdb } from '../config/firebase';
-import { ref, set, get, child } from 'firebase/database';
 import {
     onAuthStateChanged,
-    signInWithPopup,
-    signOut,
+    signOut
 } from "firebase/auth";
-import { useDispatch, useSelector } from "react-redux";
-import { authActions } from "../store/authSlice";
 import { useEffect, useRef } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { Link, Outlet, useNavigate } from "react-router-dom";
+import { auth } from '../config/firebase';
+import { authActions } from "../store/authSlice";
 
 import {
-    Flex,
-    Button,
-    Spacer,
     Box,
+    Button,
+    Flex,
     Menu,
     MenuButton,
-    MenuList,
-    MenuItem,
-    MenuGroup,
     MenuDivider,
-} from '@chakra-ui/react'
+    MenuGroup,
+    MenuItem,
+    MenuList,
+    Spacer,
+} from '@chakra-ui/react';
 
 import signInWithGoogleHandler from '../config/signin';
 
@@ -38,7 +33,6 @@ const ToolBar = (props) => {
     const signInHandler = async (event) => {
         event.preventDefault();
         signInWithGoogleHandler(event);
-        // navigate('/editor/' + response.user.uid)
     }
 
     const logoutHandler = async (event) => {
@@ -89,15 +83,6 @@ const ToolBar = (props) => {
                     <Button ml='2'>
                         <Link to='/'>Home</Link>
                     </Button>
-
-
-                    {/* {
-                    isAuthenticated
-                    &&
-                    <Button>
-                            <Link to={'/editor/' + `${authenticationData['uid']}`}>Editor</Link>
-                    </Button>
-                } */}
 
                     <Button>
                         <Link to='/about'>About</Link>

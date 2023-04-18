@@ -1,25 +1,25 @@
-import { useSelector, useDispatch } from 'react-redux';
-import { redirect } from 'react-router-dom'
-import { userDataActions } from '../store/userDataSlice'
+import { useDispatch, useSelector } from 'react-redux';
+import { redirect } from 'react-router-dom';
+import { userDataActions } from '../store/userDataSlice';
 
 import {
     ChevronDownIcon
-} from '@chakra-ui/icons'
+} from '@chakra-ui/icons';
 
 import {
     BeatLoader
-} from 'react-spinners'
+} from 'react-spinners';
 
 import {
     Box,
+    Button,
+    Flex,
+    FormControl,
+    Input,
     Menu,
     MenuButton,
-    MenuList,
     MenuItem,
-    FormControl,
-    Flex,
-    Input,
-    Button,
+    MenuList,
 } from '@chakra-ui/react';
 
 const MainPage = (props, ref) => {
