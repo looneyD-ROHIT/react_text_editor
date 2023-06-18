@@ -59,7 +59,7 @@ const signInWithGoogleHandler = async (event) => {
         localStorage.setItem('token', token);
         localStorage.setItem('uid', response.user.uid);
     } catch (err) {
-        // console.log('SignInError', err)
+        console.log('SignInError', err)
     }
 }
 

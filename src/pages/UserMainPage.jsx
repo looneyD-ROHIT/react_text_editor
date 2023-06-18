@@ -193,7 +193,7 @@ const MainPage = (props, ref) => {
             // character count
             const cleanCharacters = fileData.replace(/<(?:.|\n)*?>/gm, '').replace(/(\r\n|\n|\r)/gm, "").replace('&nbsp;', '');
             const num1 = cleanCharacters.trim().length;
-            console.log(num1);
+            // console.log(num1);
             setTotalCount(prev => {
                 return {
                     ...prev,
@@ -204,7 +204,7 @@ const MainPage = (props, ref) => {
             // word count
             const cleanWords = fileData.replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ');
             const num2 = cleanWords.trim().split(/\s+/).length;
-            console.log(num2);
+            // console.log(num2);
             setTotalCount(prev => {
                 return {
                     ...prev,

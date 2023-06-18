@@ -101,12 +101,12 @@ const MainTextArea = (props, ref) => {
             })
 
             const resp = await getDoc(docRef);
-            console.log();
+            // console.log();
             const newFileData = resp.data().fileData;
 
             const rtdbRef = dbRef(rtdb, '/totalCount/');
             const snapshot = await get(rtdbRef);
-            console.log(snapshot.val());
+            // console.log(snapshot.val());
             // console.log(snapshot.val());
             // character count
             const cleanCharacters = newFileData.replace(/<(?:.|\n)*?>/gm, '').replace(/(\r\n|\n|\r)/gm, "").replace('&nbsp;', '');
@@ -117,12 +117,12 @@ const MainTextArea = (props, ref) => {
 
             if (props.prevTotalCount.totalCharacters != num1 || props.prevTotalCount.totalCharacters != num1) {
                 // characters
-                console.log(num1);
-                console.log(props.prevTotalCount.totalCharacters);
+                // console.log(num1);
+                // console.log(props.prevTotalCount.totalCharacters);
                 const diff = num1 - props.prevTotalCount.totalCharacters;
-                console.log(diff);
+                // console.log(diff);
                 const newTotalCharacters = (snapshot.val().totalCharacters + diff) >= 0 ? snapshot.val().totalCharacters + diff : 0;
-                console.log(newTotalCharacters);
+                // console.log(newTotalCharacters);
                 props.setPrevTotalCount(prev => {
                     return {
                         ...prev,
@@ -132,12 +132,12 @@ const MainTextArea = (props, ref) => {
 
 
                 // words
-                console.log(num2);
-                console.log(props.prevTotalCount.totalWords);
+                // console.log(num2);
+                // console.log(props.prevTotalCount.totalWords);
                 const diff2 = num2 - props.prevTotalCount.totalWords;
-                console.log(diff2);
+                // console.log(diff2);
                 const newTotalWords = (snapshot.val().totalWords + diff2) >= 0 ? snapshot.val().totalWords + diff2 : 0;
-                console.log(newTotalWords);
+                // console.log(newTotalWords);
                 props.setPrevTotalCount(prev => {
                     return {
                         ...prev,

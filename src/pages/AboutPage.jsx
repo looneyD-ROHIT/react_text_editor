@@ -7,9 +7,12 @@ import {
     StatLabel,
     StatNumber,
     useColorModeValue,
+    SkeletonText
 } from '@chakra-ui/react';
 
-import { useEffect, useState } from 'react';
+import { defer, Await, useLoaderData } from 'react-router-dom';
+
+import { useEffect, useState, Suspense } from 'react';
 import { BsFileText, BsPerson } from 'react-icons/bs';
 import { GoLocation } from 'react-icons/go';
 
@@ -50,61 +53,70 @@ function StatsCard(props) {
 }
 
 const AboutPage = () => {
-    const [totalCharacters, setTotalCharacters] = useState(0);
-    const [totalWords, setTotalWords] = useState(0);
-    const [totalUsers, setTotalUsers] = useState(0);
-    useEffect(() => {
-        const timerId = setTimeout(async () => {
-            try {
-                const rtdbCountRef = ref(rtdb, '/totalCount');
-                const res = await get(rtdbCountRef);
-                console.log(res.val());
-                setTotalCharacters(res.val().totalCharacters);
-                setTotalWords(res.val().totalWords);
-                setTotalUsers(res.val().totalUsers);
-                setUsers(users);
-            } catch (error) {
-                console.error('error while fetching records: ', error);
-            }
-        }, 300);
-        return () => {
-            // console.log('CLEANUP!!! from about page')
-            clearTimeout(timerId);
-        }
-    }, [])
+    const { loaderData } = useLoaderData();
     return (
-        <>
-            <Flex mb={'300px'} mt={'80px'} direction={'column'} justify='center' maxW="7xl" mx={'auto'} pt={5} px={{ base: 2, sm: 12, md: 17 }}>
-                <chakra.h1
-                    textAlign={'center'}
-                    fontSize={'4xl'}
-                    py={10}
-                    fontWeight={'bold'}
-                    h={'250px'}
-                >
-                    We make text editing, EASY, proof is below.
-                </chakra.h1>
-                <SimpleGrid columns={{ base: 1, md: 3 }} spacing={{ base: 5, lg: 8 }}>
-                    <StatsCard
-                        title={'Our Library'}
-                        stat={`Words: ${totalWords}+`}
-                        icon={<BsFileText size={'3em'} />}
-                    />
-                    <StatsCard
-                        title={'Users'}
-                        stat={`Registered: ${totalUsers}+`}
-                        icon={<BsPerson size={'3em'} />}
-                    />
-                    <StatsCard
-                        title={'Available Anywhere'}
-                        stat={'Countries: 190+'}
-                        icon={<GoLocation size={'3em'} />}
-                    />
-                </SimpleGrid>
-            </Flex>
-            <Footer></Footer>
-        </>
+        <Suspense fallback={
+            <Box padding='6' boxShadow='lg' bg='white'>
+                <SkeletonText mt='4' noOfLines={40} spacing='3' skeletonHeight='1' />
+            </Box>
+        }>
+            <Await resolve={loaderData}>
+                {
+                    (loaderData) => {
+                        return <>
+                            <Flex mb={'300px'} mt={'80px'} direction={'column'} justify='center' maxW="7xl" mx={'auto'} pt={5} px={{ base: 2, sm: 12, md: 17 }}>
+                                <chakra.h1
+                                    textAlign={'center'}
+                                    fontSize={'4xl'}
+                                    py={10}
+                                    fontWeight={'bold'}
+                                    h={'250px'}
+                                >
+                                    We make text editing, EASY, proof is below.
+                                </chakra.h1>
+                                <SimpleGrid columns={{ base: 1, md: 3 }} spacing={{ base: 5, lg: 8 }}>
+                                    <StatsCard
+                                        title={'Our Library'}
+                                        stat={`Words: ${loaderData["totalWords"]}+`}
+                                        icon={<BsFileText size={'3em'} />}
+                                    />
+                                    <StatsCard
+                                        title={'Users'}
+                                        stat={`Registered: ${loaderData["totalUsers"]}+`}
+                                        icon={<BsPerson size={'3em'} />}
+                                    />
+                                    <StatsCard
+                                        title={'Available Anywhere'}
+                                        stat={'Countries: 190+'}
+                                        icon={<GoLocation size={'3em'} />}
+                                    />
+                                </SimpleGrid>
+                            </Flex>
+                            <Footer></Footer>
+                        </>
+                    }
+
+                }
+            </Await>
+        </Suspense>
+
     );
 }
 
 export default AboutPage;
+
+const loadAboutDataHelper = async ({ request, params }) => {
+    try {
+        const rtdbCountRef = ref(rtdb, '/totalCount');
+        const res = await get(rtdbCountRef);
+        return res.val();
+    } catch (err) {
+        console.error(err);
+    }
+}
+
+export const loadAboutData = ({ request, params }) => {
+    return defer({
+        loaderData: loadAboutDataHelper({ request, params })
+    })
+}

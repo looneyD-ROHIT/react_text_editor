@@ -46,7 +46,7 @@ const ToolBar = (props) => {
             dispatch(authActions.changeAuthStatus(false));
             navigate('/')
         } catch (err) {
-            // console.log('LogOutError', err)
+            console.log('LogOutError', err)
         }
     }
 
